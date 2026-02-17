@@ -1,90 +1,76 @@
-// Mock API functions with random responses
-// These can be easily replaced with actual API calls by changing the route names
+/**
+ * Auth API - uses common api client, re-exports for auth-context
+ */
 
-export type UserRole = "user" | "admin";
+import { apiPost, apiGet } from "./api/client";
+import type { User } from "./api/auth";
 
-interface LoginResponse {
+export type { User };
+
+interface AuthResponse {
   success: boolean;
   token?: string;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    role: UserRole;
-  };
+  user?: User;
+  expiresIn?: number;
   error?: string;
 }
 
-interface RegisterResponse {
-  success: boolean;
-  token?: string;
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-    role: UserRole;
-  };
-  error?: string;
+function normalizeUser(u: { role?: string }): User {
+  return { ...u, role: (u.role ?? "user").toLowerCase() } as User;
 }
 
-// Random delay helper
-const randomDelay = () => Math.random() * 1000 + 500;
-
-// Random success helper (80% success rate)
-const randomSuccess = () => Math.random() > 0.2;
-
-// Mock login API
-export async function loginAPI(email: string, password: string): Promise<LoginResponse> {
-  await new Promise((resolve) => setTimeout(resolve, randomDelay()));
-
-  if (!randomSuccess()) {
-    return {
-      success: false,
-      error: "Invalid credentials. Please try again.",
-    };
+export async function loginAPI(email: string, password: string): Promise<AuthResponse> {
+  try {
+    const data = await apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
+      "/auth/login",
+      { email, password }
+    );
+    return { success: true, token: data.token, user: normalizeUser(data.user), expiresIn: data.expiresIn };
+  } catch (e) {
+    return { success: false, error: (e as Error).message };
   }
-
-  const names = ["John Doe", "Jane Smith", "Bob Johnson", "Alice Williams", "Charlie Brown"];
-  const randomName = names[Math.floor(Math.random() * names.length)];
-  // Demo: admin@example.com -> admin, else user
-  const role: UserRole = email.toLowerCase() === "admin@example.com" ? "admin" : "user";
-
-  return {
-    success: true,
-    token: "mock_token_" + Date.now() + "_" + Math.random().toString(36).substring(7),
-    user: {
-      id: Math.random().toString(36).substring(7),
-      name: randomName,
-      email: email,
-      role,
-    },
-  };
 }
 
-// Mock register API
 export async function registerAPI(
   name: string,
   email: string,
   password: string
-): Promise<RegisterResponse> {
-  await new Promise((resolve) => setTimeout(resolve, randomDelay()));
-
-  if (!randomSuccess()) {
-    return {
-      success: false,
-      error: "Registration failed. Email may already be in use.",
-    };
+): Promise<AuthResponse> {
+  try {
+    const data = await apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
+      "/auth/register",
+      { name, email, password }
+    );
+    return { success: true, token: data.token, user: normalizeUser(data.user), expiresIn: data.expiresIn };
+  } catch (e) {
+    return { success: false, error: (e as Error).message };
   }
+}
 
-  const role: UserRole = email.toLowerCase() === "admin@example.com" ? "admin" : "user";
-  return {
-    success: true,
-    token: "mock_token_" + Date.now() + "_" + Math.random().toString(36).substring(7),
-    user: {
-      id: Math.random().toString(36).substring(7),
-      name: name,
-      email: email,
-      role,
-    },
-  };
+export async function logoutAPI(): Promise<void> {
+  try {
+    await apiPost("/auth/logout");
+  } catch {
+    // Clear local state even if API fails
+  }
+}
+
+export async function refreshTokenAPI(): Promise<AuthResponse> {
+  try {
+    const data = await apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
+      "/auth/refresh"
+    );
+    return { success: true, token: data.token, user: normalizeUser(data.user), expiresIn: data.expiresIn };
+  } catch (e) {
+    return { success: false, error: (e as Error).message };
+  }
+}
+
+export async function meAPI(): Promise<User | null> {
+  try {
+    const data = await apiGet<User>("/auth/me");
+    return data ? normalizeUser(data) : null;
+  } catch {
+    return null;
+  }
 }

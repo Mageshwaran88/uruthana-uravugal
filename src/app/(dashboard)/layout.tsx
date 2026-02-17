@@ -9,11 +9,13 @@ const routeRoles: Record<string, UserRole[]> = {
   "/admin": ["admin"],
   "/user": ["user"],
   "/dashboard": [], // any authenticated
+  "/savings": [], // any authenticated
 };
 
 function getAllowedRoles(pathname: string): UserRole[] | undefined {
-  if (pathname.startsWith("/admin")) return routeRoles["/admin"];
+  if (pathname.startsWith("/admin/savings") || pathname.startsWith("/admin")) return routeRoles["/admin"];
   if (pathname.startsWith("/user")) return routeRoles["/user"];
+  if (pathname.startsWith("/savings")) return routeRoles["/savings"];
   if (pathname.startsWith("/dashboard")) return routeRoles["/dashboard"];
   return [];
 }

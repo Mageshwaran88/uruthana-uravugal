@@ -2,14 +2,9 @@
 
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { loginAPI, registerAPI } from "./auth-api";
-
-export interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: "user" | "admin";
-}
+import { loginAPI, registerAPI, logoutAPI, refreshTokenAPI, meAPI } from "./auth-api";
+import type { User } from "./auth-api";
+export type { User } from "./auth-api";
 
 interface AuthContextType {
   user: User | null;
@@ -35,19 +30,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const checkAuth = useCallback(async () => {
     try {
-      // Check localStorage for auth token
       const token = localStorage.getItem("auth_token");
-      const userData = localStorage.getItem("user_data");
-
-      if (token && userData) {
-        const parsed = JSON.parse(userData);
-        const parsedUser = { ...parsed, role: parsed.role ?? "user" };
-        setUser(parsedUser);
-        // Ensure cookie is set for middleware
-        if (typeof document !== "undefined") {
-          document.cookie = `auth_token=${token}; path=/; max-age=86400; SameSite=Lax`;
+      let me = token ? await meAPI() : null;
+      if (!me && token) {
+        const refreshed = await refreshTokenAPI();
+        if (refreshed.success && refreshed.token && refreshed.user) {
+          localStorage.setItem("auth_token", refreshed.token);
+          localStorage.setItem("user_data", JSON.stringify(refreshed.user));
+          document.cookie = `auth_token=${refreshed.token}; path=/; max-age=900; SameSite=Lax`;
+          setUser(refreshed.user);
+          return;
+        }
+      }
+      if (!me && !token) {
+        const refreshed = await refreshTokenAPI();
+        if (refreshed.success && refreshed.token && refreshed.user) {
+          localStorage.setItem("auth_token", refreshed.token);
+          localStorage.setItem("user_data", JSON.stringify(refreshed.user));
+          document.cookie = `auth_token=${refreshed.token}; path=/; max-age=900; SameSite=Lax`;
+          setUser(refreshed.user);
+          return;
+        }
+      }
+      if (me) {
+        const stored = localStorage.getItem("user_data");
+        const parsed = stored ? JSON.parse(stored) : {};
+        setUser({ ...parsed, ...me });
+        if (token) {
+          document.cookie = `auth_token=${token}; path=/; max-age=900; SameSite=Lax`;
         }
       } else {
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("user_data");
+        document.cookie = "auth_token=; path=/; max-age=0";
         setUser(null);
       }
     } catch (error) {
@@ -106,12 +121,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [router]);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("user_data");
-    document.cookie = "auth_token=; path=/; max-age=0";
-    setUser(null);
-    router.replace("/login");
+  const logout = useCallback(async () => {
+    try {
+      await logoutAPI();
+    } finally {
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("user_data");
+      document.cookie = "auth_token=; path=/; max-age=0";
+      setUser(null);
+      router.replace("/login");
+    }
   }, [router]);
 
   return (
