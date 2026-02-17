@@ -1,0 +1,30 @@
+{
+  "stats": [
+    { "title": "Total Users", "value": "1,234", "subtitle": "+12% from last month", "icon": "Users" },
+    { "title": "Active Sessions", "value": "567", "subtitle": "+8% from last week", "icon": "BarChart3" },
+    { "title": "System Status", "value": "Operational", "subtitle": "All systems normal", "icon": "Settings" },
+    { "title": "Admin Access", "value": "Enabled", "subtitle": "Full permissions", "icon": "Shield" }
+  ],
+  "barChart": {
+    "title": "Users by Role",
+    "dataKey": "count",
+    "nameKey": "role",
+    "data": [
+      { "role": "User", "count": 980 },
+      { "role": "Admin", "count": 254 }
+    ]
+  },
+  "lineChart": {
+    "title": "Sessions (Last 6 Months)",
+    "dataKey": "sessions",
+    "nameKey": "month",
+    "data": [
+      { "month": "Jan", "sessions": 3200 },
+      { "month": "Feb", "sessions": 4100 },
+      { "month": "Mar", "sessions": 3800 },
+      { "month": "Apr", "sessions": 5200 },
+      { "month": "May", "sessions": 4800 },
+      { "month": "Jun", "sessions": 6100 }
+    ]
+  }
+}

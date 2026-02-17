@@ -1,0 +1,32 @@
+{
+  "stats": [
+    { "title": "Overview", "value": "Dashboard", "subtitle": "Welcome back", "icon": "LayoutDashboard" },
+    { "title": "Quick Stats", "value": "Live", "subtitle": "Data updated", "icon": "Activity" }
+  ],
+  "barChart": {
+    "title": "Activity Summary",
+    "dataKey": "value",
+    "nameKey": "label",
+    "data": [
+      { "label": "Mon", "value": 12 },
+      { "label": "Tue", "value": 19 },
+      { "label": "Wed", "value": 15 },
+      { "label": "Thu", "value": 22 },
+      { "label": "Fri", "value": 18 },
+      { "label": "Sat", "value": 8 },
+      { "label": "Sun", "value": 5 }
+    ]
+  },
+  "lineChart": {
+    "title": "Weekly Trend",
+    "dataKey": "value",
+    "nameKey": "day",
+    "data": [
+      { "day": "Mon", "value": 30 },
+      { "day": "Tue", "value": 45 },
+      { "day": "Wed", "value": 38 },
+      { "day": "Thu", "value": 52 },
+      { "day": "Fri", "value": 48 }
+    ]
+  }
+}

@@ -12,18 +12,30 @@ import {
   X,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import type { UserRole } from "@/types/auth";
 
-const navItems = [
-  { href: "/admin", label: "Admin", icon: Shield },
-  { href: "/user", label: "User", icon: Users },
+const allNavItems: Array<{
+  href: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  roles: UserRole[];
+}> = [
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["user", "admin"] },
+  { href: "/user", label: "User", icon: Users, roles: ["user"] },
+  { href: "/admin", label: "Admin", icon: Shield, roles: ["admin"] },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const navItems = allNavItems.filter((item) => user?.role && item.roles.includes(user.role));  
+  // On desktop always show sidebar width; on mobile animate open/close
+  const sidebarWidth = isDesktop ? "16rem" : isMobileOpen ? "100%" : "0%";
 
   return (
     <>
@@ -41,13 +53,11 @@ export default function Sidebar() {
       {/* Sidebar */}
       <motion.aside
         initial={false}
-        animate={{
-          width: isMobileOpen ? "100%" : "0%",
-        }}
+        animate={{ width: sidebarWidth }}
         className={cn(
           "fixed lg:sticky top-0 left-0 h-screen lg:h-auto z-40 bg-card border-r border-border overflow-hidden",
-          "lg:w-64 lg:block",
-          isMobileOpen ? "block" : "hidden"
+          "lg:block shrink-0",
+          !isDesktop && (isMobileOpen ? "block" : "hidden")
         )}
       >
         <div className="h-full flex flex-col p-6">

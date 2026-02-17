@@ -4,10 +4,11 @@ import { createContext, useContext, useState, useCallback, useEffect } from "rea
 import { useRouter } from "next/navigation";
 import { loginAPI, registerAPI } from "./auth-api";
 
-interface User {
+export interface User {
   id: string;
   name: string;
   email: string;
+  role: "user" | "admin";
 }
 
 interface AuthContextType {
@@ -39,7 +40,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const userData = localStorage.getItem("user_data");
 
       if (token && userData) {
-        const parsedUser = JSON.parse(userData);
+        const parsed = JSON.parse(userData);
+        const parsedUser = { ...parsed, role: parsed.role ?? "user" };
         setUser(parsedUser);
         // Ensure cookie is set for middleware
         if (typeof document !== "undefined") {
@@ -73,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       document.cookie = `auth_token=${response.token}; path=/; max-age=86400; SameSite=Lax`;
 
       setUser(response.user);
-      router.push("/admin");
+      router.replace("/dashboard");
     } catch (error) {
       console.error("Login failed:", error);
       throw error;
@@ -97,7 +99,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       document.cookie = `auth_token=${response.token}; path=/; max-age=86400; SameSite=Lax`;
 
       setUser(response.user);
-      router.push("/admin");
+      router.replace("/dashboard");
     } catch (error) {
       console.error("Registration failed:", error);
       throw error;
@@ -107,10 +109,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     localStorage.removeItem("auth_token");
     localStorage.removeItem("user_data");
-    // Remove cookie
     document.cookie = "auth_token=; path=/; max-age=0";
     setUser(null);
-    router.push("/login");
+    router.replace("/login");
   }, [router]);
 
   return (

@@ -1,6 +1,8 @@
 // Mock API functions with random responses
 // These can be easily replaced with actual API calls by changing the route names
 
+export type UserRole = "user" | "admin";
+
 interface LoginResponse {
   success: boolean;
   token?: string;
@@ -8,6 +10,7 @@ interface LoginResponse {
     id: string;
     name: string;
     email: string;
+    role: UserRole;
   };
   error?: string;
 }
@@ -19,6 +22,7 @@ interface RegisterResponse {
     id: string;
     name: string;
     email: string;
+    role: UserRole;
   };
   error?: string;
 }
@@ -42,6 +46,8 @@ export async function loginAPI(email: string, password: string): Promise<LoginRe
 
   const names = ["John Doe", "Jane Smith", "Bob Johnson", "Alice Williams", "Charlie Brown"];
   const randomName = names[Math.floor(Math.random() * names.length)];
+  // Demo: admin@example.com -> admin, else user
+  const role: UserRole = email.toLowerCase() === "admin@example.com" ? "admin" : "user";
 
   return {
     success: true,
@@ -50,6 +56,7 @@ export async function loginAPI(email: string, password: string): Promise<LoginRe
       id: Math.random().toString(36).substring(7),
       name: randomName,
       email: email,
+      role,
     },
   };
 }
@@ -69,6 +76,7 @@ export async function registerAPI(
     };
   }
 
+  const role: UserRole = email.toLowerCase() === "admin@example.com" ? "admin" : "user";
   return {
     success: true,
     token: "mock_token_" + Date.now() + "_" + Math.random().toString(36).substring(7),
@@ -76,6 +84,7 @@ export async function registerAPI(
       id: Math.random().toString(36).substring(7),
       name: name,
       email: email,
+      role,
     },
   };
 }

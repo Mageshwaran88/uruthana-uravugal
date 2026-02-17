@@ -1,0 +1,31 @@
+{
+  "stats": [
+    { "title": "Profile", "value": "Active", "subtitle": "Account verified", "icon": "User" },
+    { "title": "Savings Goal", "value": "$5,000", "subtitle": "Target: $10,000", "icon": "Target" },
+    { "title": "Progress", "value": "50%", "subtitle": "On track", "icon": "TrendingUp" }
+  ],
+  "barChart": {
+    "title": "Monthly Savings",
+    "dataKey": "amount",
+    "nameKey": "month",
+    "data": [
+      { "month": "Jan", "amount": 400 },
+      { "month": "Feb", "amount": 600 },
+      { "month": "Mar", "amount": 800 },
+      { "month": "Apr", "amount": 950 },
+      { "month": "May", "amount": 1100 },
+      { "month": "Jun", "amount": 1250 }
+    ]
+  },
+  "lineChart": {
+    "title": "Balance Over Time",
+    "dataKey": "balance",
+    "nameKey": "week",
+    "data": [
+      { "week": "W1", "balance": 2400 },
+      { "week": "W2", "balance": 3200 },
+      { "week": "W3", "balance": 4100 },
+      { "week": "W4", "balance": 5000 }
+    ]
+  }
+}

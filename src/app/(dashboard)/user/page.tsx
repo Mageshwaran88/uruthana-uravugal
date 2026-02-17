@@ -1,7 +1,18 @@
-import { User, Target, TrendingUp, Calendar } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
+
+import { User, Target, TrendingUp } from "lucide-react";
+import { StatCard, DashboardBarChart, DashboardLineChart } from "@/components/dashboard";
+import userData from "@/data/user-dashboard.json";
+
+const iconMap = {
+  User,
+  Target,
+  TrendingUp,
+};
 
 export default function UserPage() {
+  const { stats, barChart, lineChart } = userData;
+
   return (
     <div className="space-y-6">
       <div>
@@ -12,40 +23,34 @@ export default function UserPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Profile</CardTitle>
-            <User className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Active</div>
-            <p className="text-xs text-muted-foreground">Account verified</p>
-          </CardContent>
-        </Card>
+        {stats.map((stat) => {
+          const Icon = iconMap[stat.icon as keyof typeof iconMap];
+          return (
+            <StatCard
+              key={stat.title}
+              title={stat.title}
+              value={stat.value}
+              subtitle={stat.subtitle}
+              icon={Icon}
+            />
+          );
+        })}
+      </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Savings Goal</CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$5,000</div>
-            <p className="text-xs text-muted-foreground">Target: $10,000</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Progress</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">50%</div>
-            <p className="text-xs text-muted-foreground">On track</p>
-          </CardContent>
-        </Card>
+      <div className="grid gap-6 md:grid-cols-2">
+        <DashboardBarChart
+          title={barChart.title}
+          data={barChart.data}
+          dataKey={barChart.dataKey}
+          nameKey={barChart.nameKey}
+        />
+        <DashboardLineChart
+          title={lineChart.title}
+          data={lineChart.data}
+          dataKey={lineChart.dataKey}
+          nameKey={lineChart.nameKey}
+        />
       </div>
     </div>
   );
 }
-  

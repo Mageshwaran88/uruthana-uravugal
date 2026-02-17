@@ -1,29 +1,27 @@
 "use client";
 
-import { Shield, Users, Settings, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Activity } from "lucide-react";
 import { StatCard, DashboardBarChart, DashboardLineChart } from "@/components/dashboard";
-import adminData from "@/data/admin-dashboard.json";
+import dashboardData from "@/data/dashboard-common.json";
 
 const iconMap = {
-  Shield,
-  Users,
-  Settings,
-  BarChart3,
+  LayoutDashboard,
+  Activity,
 };
 
-export default function AdminPage() {
-  const { stats, barChart, lineChart } = adminData;
+export default function DashboardPage() {
+  const { stats, barChart, lineChart } = dashboardData;
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground mt-2">
-          Manage users, reports, and system settings.
+          Overview and quick stats. Use the sidebar to open User or Admin views.
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {stats.map((stat) => {
           const Icon = iconMap[stat.icon as keyof typeof iconMap];
           return (
