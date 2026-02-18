@@ -8,8 +8,10 @@ import type { UserRole } from "@/types/auth";
 const routeRoles: Record<string, UserRole[]> = {
   "/admin": ["admin"],
   "/user": ["user"],
-  "/dashboard": [], // any authenticated
-  "/savings": [], // any authenticated
+  "/dashboard": [],
+  "/savings": [],
+  "/profile": [],
+  "/settings": [],
 };
 
 function getAllowedRoles(pathname: string): UserRole[] | undefined {
@@ -17,6 +19,8 @@ function getAllowedRoles(pathname: string): UserRole[] | undefined {
   if (pathname.startsWith("/user")) return routeRoles["/user"];
   if (pathname.startsWith("/savings")) return routeRoles["/savings"];
   if (pathname.startsWith("/dashboard")) return routeRoles["/dashboard"];
+  if (pathname.startsWith("/profile")) return routeRoles["/profile"];
+  if (pathname.startsWith("/settings")) return routeRoles["/settings"];
   return [];
 }
 

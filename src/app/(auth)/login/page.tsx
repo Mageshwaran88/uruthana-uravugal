@@ -41,10 +41,18 @@ export default function Login() {
       isLoading={isLoading}
       footer={
         <>
-          <span className="text-muted-foreground">Don't have an account? </span>
-          <Link href="/register" className="text-primary hover:underline">
-            Sign up
-          </Link>
+          <div className="flex flex-col gap-2 text-center">
+            <Link
+              href="/forgot-password"
+              className="text-primary hover:underline text-sm"
+            >
+              Forgot password?
+            </Link>
+            <span className="text-muted-foreground">Don't have an account? </span>
+            <Link href="/register" className="text-primary hover:underline">
+              Sign up
+            </Link>
+          </div>
         </>
       }
     >

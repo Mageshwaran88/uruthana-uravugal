@@ -34,6 +34,9 @@ export default function SavingsPage() {
   const [period, setPeriod] = useState<"daily" | "weekly" | "monthly">("monthly");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const [typeFilter, setTypeFilter] = useState<"CREDIT" | "DEBIT" | "">("");
+  const [sortBy, setSortBy] = useState("date");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [addAmount, setAddAmount] = useState("");
@@ -60,8 +63,16 @@ export default function SavingsPage() {
   const effectiveTo = toDate || format(dateRange.to, "yyyy-MM-dd");
 
   useEffect(() => {
-    fetchAll({ fromDate: effectiveFrom, toDate: effectiveTo, page, limit: 20 });
-  }, [effectiveFrom, effectiveTo, page, fetchAll]);
+    fetchAll({
+      fromDate: effectiveFrom,
+      toDate: effectiveTo,
+      page,
+      limit: 20,
+      ...(typeFilter && { type: typeFilter }),
+      sortBy,
+      sortOrder,
+    });
+  }, [effectiveFrom, effectiveTo, page, typeFilter, sortBy, sortOrder, fetchAll]);
 
   useEffect(() => {
     fetchSummary();
@@ -190,6 +201,29 @@ export default function SavingsPage() {
         <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="rounded-md border px-3 py-2 text-sm" />
         <span className="text-muted-foreground">to</span>
         <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="rounded-md border px-3 py-2 text-sm" />
+        <select
+          value={typeFilter}
+          onChange={(e) => setTypeFilter(e.target.value as "CREDIT" | "DEBIT" | "")}
+          className="rounded-md border px-3 py-2 text-sm"
+        >
+          <option value="">All types</option>
+          <option value="CREDIT">Credit</option>
+          <option value="DEBIT">Debit</option>
+        </select>
+        <select
+          value={`${sortBy}-${sortOrder}`}
+          onChange={(e) => {
+            const [s, o] = (e.target.value as string).split("-");
+            setSortBy(s);
+            setSortOrder((o as "asc" | "desc") || "desc");
+          }}
+          className="rounded-md border px-3 py-2 text-sm"
+        >
+          <option value="date-desc">Date (newest)</option>
+          <option value="date-asc">Date (oldest)</option>
+          <option value="amount-desc">Amount (high–low)</option>
+          <option value="amount-asc">Amount (low–high)</option>
+        </select>
       </div>
 
       <Card>

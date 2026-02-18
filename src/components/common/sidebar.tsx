@@ -11,6 +11,8 @@ import {
   Menu,
   X,
   PiggyBank,
+  UserCircle,
+  Settings,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { useMediaQuery } from "@/lib/use-media-query";
@@ -26,8 +28,11 @@ const allNavItems: Array<{
 }> = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["user", "admin"] },
   { href: "/savings", label: "My Savings", icon: PiggyBank, roles: ["user", "admin"] },
+  { href: "/profile", label: "Profile", icon: UserCircle, roles: ["user", "admin"] },
+  { href: "/settings", label: "Settings", icon: Settings, roles: ["user", "admin"] },
   { href: "/user", label: "User", icon: Users, roles: ["user"] },
   { href: "/admin", label: "Admin", icon: Shield, roles: ["admin"] },
+  { href: "/admin/users", label: "Admin Users", icon: Users, roles: ["admin"] },
   { href: "/admin/savings", label: "Admin Savings", icon: PiggyBank, roles: ["admin"] },
 ];
 
@@ -104,7 +109,7 @@ export default function Sidebar() {
                 <p className="text-sm font-medium text-foreground">
                   {user.name}
                 </p>
-                <p className="text-xs text-muted-foreground">{user.email}</p>
+                <p className="text-xs text-muted-foreground">{user.email ?? user.mobile ?? "—"}</p>
               </div>
             )}
             <button

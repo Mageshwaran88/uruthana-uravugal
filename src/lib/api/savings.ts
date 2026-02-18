@@ -49,8 +49,11 @@ export interface SavingsFilters {
   fromDate?: string;
   toDate?: string;
   userId?: string;
+  type?: TransactionType;
   page?: number;
   limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 function queryString(params?: SavingsFilters): string {
@@ -59,8 +62,11 @@ function queryString(params?: SavingsFilters): string {
   if (params.fromDate) q.set("fromDate", params.fromDate);
   if (params.toDate) q.set("toDate", params.toDate);
   if (params.userId) q.set("userId", params.userId);
+  if (params.type) q.set("type", params.type);
   if (params.page) q.set("page", String(params.page));
   if (params.limit) q.set("limit", String(params.limit));
+  if (params.sortBy) q.set("sortBy", params.sortBy);
+  if (params.sortOrder) q.set("sortOrder", params.sortOrder);
   const s = q.toString();
   return s ? `?${s}` : "";
 }

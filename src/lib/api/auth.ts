@@ -9,7 +9,8 @@ export type UserRole = "user" | "admin";
 export interface User {
   id: string;
   name: string;
-  email: string;
+  email: string | null;
+  mobile?: string | null;
   role: UserRole;
   avatarUrl?: string | null;
 }
@@ -22,6 +23,9 @@ export interface AuthResponse {
   error?: string;
 }
 
+export type OtpPurpose = "REGISTER" | "FORGOT_PASSWORD";
+export type OtpChannel = "EMAIL" | "SMS";
+
 export const authApi = {
   login: (email: string, password: string) =>
     apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
@@ -29,10 +33,16 @@ export const authApi = {
       { email, password }
     ),
 
-  register: (name: string, email: string, password: string) =>
+  register: (body: {
+    name: string;
+    email: string;
+    mobile: string;
+    password: string;
+    otp?: string;
+  }) =>
     apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
       "/auth/register",
-      { name, email, password }
+      body
     ),
 
   logout: () => apiPost<{ success: boolean }>("/auth/logout"),
@@ -43,4 +53,30 @@ export const authApi = {
     ),
 
   me: () => apiGet<User>("/auth/me"),
+
+  forgotPassword: (body: { email?: string; mobile?: string }) =>
+    apiPost<{ message: string }>("/auth/forgot-password", body),
+
+  sendOtp: (body: {
+    identifier: string;
+    purpose: OtpPurpose;
+    channel?: OtpChannel;
+  }) => apiPost<{ message: string }>("/auth/send-otp", body),
+
+  verifyOtp: (body: {
+    identifier: string;
+    purpose: OtpPurpose;
+    otp: string;
+  }) => apiPost<{ valid: boolean }>("/auth/verify-otp", body),
+
+  resetPasswordWithOtp: (body: {
+    identifier: string;
+    otp: string;
+    newPassword: string;
+  }) => apiPost<{ message: string }>("/auth/reset-password-with-otp", body),
+
+  changePassword: (body: {
+    currentPassword: string;
+    newPassword: string;
+  }) => apiPost<{ message: string }>("/auth/change-password", body),
 };

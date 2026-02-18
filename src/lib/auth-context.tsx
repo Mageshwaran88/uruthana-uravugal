@@ -11,7 +11,13 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (params: {
+    name: string;
+    email: string;
+    mobile: string;
+    password: string;
+    otp?: string;
+  }) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
 }
@@ -97,29 +103,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [router]);
 
-  const register = useCallback(async (name: string, email: string, password: string) => {
-    try {
-      // Call mock API with random responses
-      const response = await registerAPI(name, email, password);
-
-      if (!response.success || !response.user || !response.token) {
-        throw new Error(response.error || "Registration failed. Please try again.");
+  const register = useCallback(
+    async (params: {
+      name: string;
+      email: string;
+      mobile: string;
+      password: string;
+      otp?: string;
+    }) => {
+      try {
+        const response = await registerAPI(params);
+        if (!response.success || !response.user || !response.token) {
+          throw new Error(
+            response.error || "Registration failed. Please try again."
+          );
+        }
+        localStorage.setItem("auth_token", response.token);
+        localStorage.setItem("user_data", JSON.stringify(response.user));
+        document.cookie = `auth_token=${response.token}; path=/; max-age=86400; SameSite=Lax`;
+        setUser(response.user);
+        router.replace("/dashboard");
+      } catch (error) {
+        console.error("Registration failed:", error);
+        throw error;
       }
-
-      // Store in localStorage (in production, use httpOnly cookies)
-      localStorage.setItem("auth_token", response.token);
-      localStorage.setItem("user_data", JSON.stringify(response.user));
-
-      // Set cookie for middleware
-      document.cookie = `auth_token=${response.token}; path=/; max-age=86400; SameSite=Lax`;
-
-      setUser(response.user);
-      router.replace("/dashboard");
-    } catch (error) {
-      console.error("Registration failed:", error);
-      throw error;
-    }
-  }, [router]);
+    },
+    [router]
+  );
 
   const logout = useCallback(async () => {
     try {
