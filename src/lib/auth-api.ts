@@ -19,11 +19,11 @@ function normalizeUser(u: { role?: string }): User {
   return { ...u, role: (u.role ?? "user").toLowerCase() } as User;
 }
 
-export async function loginAPI(email: string, password: string): Promise<AuthResponse> {
+export async function loginAPI(identifier: string, password: string): Promise<AuthResponse> {
   try {
     const data = await apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
       "/auth/login",
-      { email, password }
+      { identifier, password }
     );
     return { success: true, token: data.token, user: normalizeUser(data.user), expiresIn: data.expiresIn };
   } catch (e) {
@@ -32,15 +32,28 @@ export async function loginAPI(email: string, password: string): Promise<AuthRes
 }
 
 export async function registerAPI(params: {
-  name: string;
   email: string;
-  mobile: string;
+  otp: string;
   password: string;
-  otp?: string;
 }): Promise<AuthResponse> {
   try {
     const data = await apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
       "/auth/register",
+      params
+    );
+    return { success: true, token: data.token, user: normalizeUser(data.user), expiresIn: data.expiresIn };
+  } catch (e) {
+    return { success: false, error: (e as Error).message };
+  }
+}
+
+export async function registerWithPhoneAPI(params: {
+  firebaseIdToken: string;
+  password: string;
+}): Promise<AuthResponse> {
+  try {
+    const data = await apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
+      "/auth/register-with-phone",
       params
     );
     return { success: true, token: data.token, user: normalizeUser(data.user), expiresIn: data.expiresIn };

@@ -27,21 +27,21 @@ export type OtpPurpose = "REGISTER" | "FORGOT_PASSWORD";
 export type OtpChannel = "EMAIL" | "SMS";
 
 export const authApi = {
-  login: (email: string, password: string) =>
+  login: (body: { identifier: string; password: string }) =>
     apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
       "/auth/login",
-      { email, password }
+      body
     ),
 
-  register: (body: {
-    name: string;
-    email: string;
-    mobile: string;
-    password: string;
-    otp?: string;
-  }) =>
+  register: (body: { email: string; otp: string; password: string }) =>
     apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
       "/auth/register",
+      body
+    ),
+
+  registerWithPhone: (body: { firebaseIdToken: string; password: string }) =>
+    apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
+      "/auth/register-with-phone",
       body
     ),
 
@@ -54,7 +54,7 @@ export const authApi = {
 
   me: () => apiGet<User>("/auth/me"),
 
-  forgotPassword: (body: { email?: string; mobile?: string }) =>
+  forgotPassword: (body: { email: string }) =>
     apiPost<{ message: string }>("/auth/forgot-password", body),
 
   sendOtp: (body: {

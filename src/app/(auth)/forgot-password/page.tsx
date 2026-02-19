@@ -13,16 +13,15 @@ import { authApi } from "@/lib/api/auth";
 import { toast } from "sonner";
 import Link from "next/link";
 import { FormWrapper, FormField } from "@/components/forms";
-import { Button } from "@/components/ui/button";
 
 export default function ForgotPasswordPage() {
   const [step, setStep] = useState<"request" | "reset">("request");
-  const [identifier, setIdentifier] = useState("");
+  const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const requestForm = useForm<ForgotPasswordType>({
     resolver: zodResolver(forgotPasswordSchema),
-    defaultValues: { email: "", mobile: "" },
+    defaultValues: { email: "" },
   });
 
   const resetForm = useForm<ResetPasswordWithOtpType>({
@@ -33,15 +32,12 @@ export default function ForgotPasswordPage() {
   async function onRequestOtp(values: ForgotPasswordType) {
     try {
       setIsLoading(true);
-      await authApi.forgotPassword({
-        email: values.email || undefined,
-        mobile: values.mobile || undefined,
-      });
-      const id = values.email?.trim() || values.mobile?.trim() || "";
-      setIdentifier(id);
+      await authApi.forgotPassword({ email: values.email });
+      const id = values.email.trim();
+      setEmail(id);
       resetForm.setValue("identifier", id);
       setStep("reset");
-      toast.success("OTP sent. Check your email or phone.");
+      toast.success("OTP sent to your email.");
     } catch (e) {
       toast.error((e as Error).message || "Failed to send OTP");
     } finally {
@@ -66,7 +62,7 @@ export default function ForgotPasswordPage() {
     return (
       <FormWrapper
         title="Set new password"
-        subtitle={`Enter the OTP sent to ${identifier}`}
+        subtitle={`Enter the OTP sent to ${email}`}
         onSubmit={resetForm.handleSubmit(onResetPassword)}
         submitLabel="Reset password"
         isLoading={isLoading}
@@ -77,7 +73,7 @@ export default function ForgotPasswordPage() {
               onClick={() => setStep("request")}
               className="text-primary hover:underline"
             >
-              Use different email or mobile
+              Use different email
             </button>
             <span className="mx-2">·</span>
             <Link href="/login" className="text-primary hover:underline">
@@ -90,7 +86,7 @@ export default function ForgotPasswordPage() {
         <FormField
           label="OTP"
           name="otp"
-          placeholder="6-digit code"
+          placeholder="6-digit code from email"
           error={resetForm.formState.errors.otp?.message}
           disabled={isLoading}
           register={resetForm.register}
@@ -113,7 +109,7 @@ export default function ForgotPasswordPage() {
   return (
     <FormWrapper
       title="Forgot password"
-      subtitle="Enter your email or mobile to receive an OTP"
+      subtitle="Enter your email to receive an OTP (forgot password uses email only)"
       onSubmit={requestForm.handleSubmit(onRequestOtp)}
       submitLabel="Send OTP"
       isLoading={isLoading}
@@ -134,24 +130,8 @@ export default function ForgotPasswordPage() {
         error={requestForm.formState.errors.email?.message}
         disabled={isLoading}
         register={requestForm.register}
+        required
       />
-      <p className="text-xs text-muted-foreground text-center">— or —</p>
-      <FormField
-        label="Mobile"
-        name="mobile"
-        type="tel"
-        placeholder="+91 9876543210"
-        error={requestForm.formState.errors.mobile?.message}
-        disabled={isLoading}
-        register={requestForm.register}
-      />
-      {(requestForm.formState.errors as { root?: { message?: string } }).root
-        ?.message && (
-        <p className="text-sm text-destructive">
-          {(requestForm.formState.errors as { root?: { message?: string } })
-            .root?.message}
-        </p>
-      )}
     </FormWrapper>
   );
 }

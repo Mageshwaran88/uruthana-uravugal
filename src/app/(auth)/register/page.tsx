@@ -15,22 +15,16 @@ export default function Register() {
   const { register: registerUser } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+
   const form = useForm<RegisterType>({
     resolver: zodResolver(registerSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      mobile: "",
-      password: "",
-      otp: "",
-    },
+    defaultValues: { email: "", password: "", otp: "" },
   });
 
   async function onSendOtp() {
-    const email = form.getValues("email");
-    const mobile = form.getValues("mobile");
-    if (!email || !mobile) {
-      toast.error("Fill email and mobile first");
+    const email = form.getValues("email").trim();
+    if (!email || !email.includes("@")) {
+      toast.error("Enter a valid email first");
       return;
     }
     try {
@@ -50,14 +44,16 @@ export default function Register() {
   }
 
   async function onSubmit(values: RegisterType) {
+    if (!otpSent) {
+      toast.error("Please send OTP first.");
+      return;
+    }
     try {
       setIsLoading(true);
       await registerUser({
-        name: values.name,
-        email: values.email,
-        mobile: values.mobile,
+        email: values.email.trim().toLowerCase(),
+        otp: values.otp,
         password: values.password,
-        otp: values.otp || undefined,
       });
       toast.success("Account created successfully!");
     } catch (error: unknown) {
@@ -70,7 +66,7 @@ export default function Register() {
   return (
     <FormWrapper
       title="Create Account"
-      subtitle="Sign up with email and mobile; verify with OTP"
+      subtitle="Sign up with your email. We'll send an OTP to your email (no mobile/SMS)."
       onSubmit={form.handleSubmit(onSubmit)}
       submitLabel="Create Account"
       isLoading={isLoading}
@@ -84,31 +80,12 @@ export default function Register() {
       }
     >
       <FormField
-        label="Name"
-        name="name"
-        placeholder="Enter your name"
-        error={form.formState.errors.name?.message}
-        disabled={isLoading}
-        register={form.register}
-        required
-      />
-      <FormField
         label="Email"
         name="email"
         type="email"
-        placeholder="Enter your email"
+        placeholder="you@example.com"
         error={form.formState.errors.email?.message}
-        disabled={isLoading}
-        register={form.register}
-        required
-      />
-      <FormField
-        label="Mobile"
-        name="mobile"
-        type="tel"
-        placeholder="+91 9876543210"
-        error={form.formState.errors.mobile?.message}
-        disabled={isLoading}
+        disabled={isLoading || otpSent}
         register={form.register}
         required
       />

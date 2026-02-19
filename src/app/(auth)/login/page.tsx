@@ -15,7 +15,7 @@ export default function Login() {
   const form = useForm<LoginType>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      identifier: "",
       password: "",
     },
   });
@@ -23,10 +23,10 @@ export default function Login() {
   async function onSubmit(values: LoginType) {
     try {
       setIsLoading(true);
-      await login(values.email, values.password);
+      await login(values.identifier.trim(), values.password);
       toast.success("Login successful!");
-    } catch (error: any) {
-      toast.error(error.message || "Login failed. Please try again.");
+    } catch (error: unknown) {
+      toast.error((error as Error).message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -35,7 +35,7 @@ export default function Login() {
   return (
     <FormWrapper
       title="Welcome Back"
-      subtitle="Sign in to your account"
+      subtitle="Sign in with your email or mobile number"
       onSubmit={form.handleSubmit(onSubmit)}
       submitLabel="Sign In"
       isLoading={isLoading}
@@ -57,11 +57,11 @@ export default function Login() {
       }
     >
       <FormField
-        label="Email"
-        name="email"
-        type="email"
-        placeholder="Enter your email"
-        error={form.formState.errors.email?.message}
+        label="Email or mobile number"
+        name="identifier"
+        type="text"
+        placeholder="you@example.com or 9876543210"
+        error={form.formState.errors.identifier?.message}
         disabled={isLoading}
         register={form.register}
         required
