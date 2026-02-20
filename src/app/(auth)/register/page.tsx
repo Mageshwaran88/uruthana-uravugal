@@ -18,7 +18,7 @@ export default function Register() {
 
   const form = useForm<RegisterType>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: "", password: "", otp: "", username: "", mobile: "" },
+    defaultValues: { email: "", sendOtpTo: "", password: "", otp: "", username: "", mobile: "" },
   });
 
   async function onSendOtp() {
@@ -27,15 +27,17 @@ export default function Register() {
       toast.error("Enter a valid email first");
       return;
     }
+    const sendOtpTo = form.getValues("sendOtpTo")?.trim();
     try {
       setIsLoading(true);
       await authApi.sendOtp({
         identifier: email,
         purpose: "REGISTER",
         channel: "EMAIL",
+        ...(sendOtpTo && sendOtpTo.includes("@") ? { sendOtpTo } : {}),
       });
       setOtpSent(true);
-      toast.success("OTP sent to your email.");
+      toast.success(sendOtpTo ? "OTP sent to the email you provided." : "OTP sent to your email.");
     } catch (e) {
       toast.error((e as Error).message || "Failed to send OTP");
     } finally {
@@ -82,14 +84,23 @@ export default function Register() {
       }
     >
       <FormField
-        label="Email"
+        label="Email (account)"
         name="email"
         type="email"
-        placeholder="you@example.com"
+        placeholder="e.g. you@company.com"
         error={form.formState.errors.email?.message}
         disabled={isLoading || otpSent}
         register={form.register}
         required
+      />
+      <FormField
+        label="Send OTP to this email instead (optional)"
+        name="sendOtpTo"
+        type="email"
+        placeholder="e.g. personal@gmail.com — use if you don't get mail at account email"
+        error={form.formState.errors.sendOtpTo?.message}
+        disabled={isLoading || otpSent}
+        register={form.register}
       />
       <FormField
         label="Username"

@@ -61,6 +61,7 @@ export const authApi = {
     identifier: string;
     purpose: OtpPurpose;
     channel?: OtpChannel;
+    sendOtpTo?: string;
   }) => apiPost<{ message: string }>("/auth/send-otp", body),
 
   verifyOtp: (body: {

@@ -11,6 +11,7 @@ export type LoginType = z.infer<typeof loginSchema>;
 
 export const registerSchema = z.object({
   email: z.string().email("Enter a valid email"),
+  sendOtpTo: z.union([z.string().email("Enter a valid email"), z.literal("")]).optional(),
   otp: z.string().length(6, "Enter the 6-digit OTP"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   username: z.string().optional(),
