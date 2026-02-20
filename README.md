@@ -104,11 +104,19 @@ src/
 ## 🔧 Configuration
 
 ### Environment Variables
-Create a `.env.local` file for environment-specific variables:
+Copy `.env.example` to `.env.local` and set:
 
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:3000
+# Backend API (must include /api). Production backend on Railway:
+NEXT_PUBLIC_API_URL=https://uruthana-uravugal-be-production.up.railway.app/api
 ```
+
+### Deploy frontend on Vercel
+1. Import this repo (or the frontend folder) as a Vercel project.
+2. In Vercel → Project → **Settings → Environment Variables**, add:
+   - **`NEXT_PUBLIC_API_URL`** = `https://uruthana-uravugal-be-production.up.railway.app/api`
+   - Add your `NEXT_PUBLIC_FIREBASE_*` variables if you use Firebase.
+3. Deploy. The build uses `next build` and will use the API URL above.
 
 ### Customization
 - Update `src/lib/auth-context.tsx` for real authentication

@@ -24,6 +24,11 @@ const nextConfig: NextConfig = {
         port: "3001",
         pathname: "/uploads/**",
       },
+      {
+        protocol: "https",
+        hostname: "uruthana-uravugal-be-production.up.railway.app",
+        pathname: "/uploads/**",
+      },
     ],
   },
 

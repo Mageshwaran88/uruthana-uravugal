@@ -37,7 +37,7 @@ export default function AdminUsersPage() {
               <Input
                 placeholder="Search by name, email, mobile..."
                 value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => { setSearch(e.target.value); setPage(1); }}
                 className="pl-9"
               />
             </div>
