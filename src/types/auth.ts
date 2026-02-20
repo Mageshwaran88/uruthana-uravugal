@@ -13,6 +13,8 @@ export const registerSchema = z.object({
   email: z.string().email("Enter a valid email"),
   otp: z.string().length(6, "Enter the 6-digit OTP"),
   password: z.string().min(6, "Password must be at least 6 characters"),
+  username: z.string().optional(),
+  mobile: z.string().optional(),
 });
 
 export type RegisterType = z.infer<typeof registerSchema>;

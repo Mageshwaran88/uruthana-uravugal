@@ -11,7 +11,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (identifier: string, password: string) => Promise<void>;
-  register: (params: { email: string; otp: string; password: string }) => Promise<void>;
+  register: (params: { email: string; otp: string; password: string; username?: string; mobile?: string }) => Promise<void>;
   registerWithPhone: (params: { firebaseIdToken: string; password: string }) => Promise<void>;
   logout: () => void;
   checkAuth: () => Promise<void>;
@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   const register = useCallback(
-    async (params: { email: string; otp: string; password: string }) => {
+    async (params: { email: string; otp: string; password: string; username?: string; mobile?: string }) => {
       try {
         const response = await registerAPI(params);
         if (!response.success || !response.user || !response.token) {

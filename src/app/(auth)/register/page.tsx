@@ -18,7 +18,7 @@ export default function Register() {
 
   const form = useForm<RegisterType>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { email: "", password: "", otp: "" },
+    defaultValues: { email: "", password: "", otp: "", username: "", mobile: "" },
   });
 
   async function onSendOtp() {
@@ -54,6 +54,8 @@ export default function Register() {
         email: values.email.trim().toLowerCase(),
         otp: values.otp,
         password: values.password,
+        username: values.username?.trim() || undefined,
+        mobile: values.mobile?.trim() || undefined,
       });
       toast.success("Account created successfully!");
     } catch (error: unknown) {
@@ -88,6 +90,24 @@ export default function Register() {
         disabled={isLoading || otpSent}
         register={form.register}
         required
+      />
+      <FormField
+        label="Username"
+        name="username"
+        type="text"
+        placeholder="Display name (optional)"
+        error={form.formState.errors.username?.message}
+        disabled={isLoading}
+        register={form.register}
+      />
+      <FormField
+        label="Mobile number"
+        name="mobile"
+        type="tel"
+        placeholder="e.g. +91 98765 43210 (optional)"
+        error={form.formState.errors.mobile?.message}
+        disabled={isLoading}
+        register={form.register}
       />
       <div className="space-y-2">
         <div className="flex gap-2">

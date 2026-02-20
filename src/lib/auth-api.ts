@@ -35,6 +35,8 @@ export async function registerAPI(params: {
   email: string;
   otp: string;
   password: string;
+  username?: string;
+  mobile?: string;
 }): Promise<AuthResponse> {
   try {
     const data = await apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(

@@ -33,7 +33,7 @@ export const authApi = {
       body
     ),
 
-  register: (body: { email: string; otp: string; password: string }) =>
+  register: (body: { email: string; otp: string; password: string; username?: string; mobile?: string }) =>
     apiPost<{ success: boolean; token: string; user: User; expiresIn: number }>(
       "/auth/register",
       body
